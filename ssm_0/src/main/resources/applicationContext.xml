@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+					http://www.springframework.org/schema/beans 
+					http://www.springframework.org/schema/beans/spring-beans.xsd
+					http://www.springframework.org/schema/context
+					http://www.springframework.org/schema/context/spring-context.xsd
+					http://www.springframework.org/schema/aop 
+					http://www.springframework.org/schema/aop/spring-aop.xsd
+					http://www.springframework.org/schema/tx 
+					http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- 配置spring创建容器时扫描的包 -->
+	<context:component-scan base-package="com.zdb.ssm">
+		<!-- 此处可以配置扫描哪些注解，或者排除哪些注解,此处是排除Controller注解 -->
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+
+
+	<!-- 指定配置文件的位置 -->
+	<context:property-placeholder location="classpath:res/jdbcConfig.properties"/>
+	<!-- 配置数据源 -->
+	<bean id="datasource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driver}"></property>
+		<property name="url" value="${jdbc.url}"></property>
+		<property name="username" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+	</bean>
+	
+	
+	<!-- 配置myBatis-spring整合jar整合的SqlSessionFactoryBean -->
+	<bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="datasource"></property>
+		<!-- <property name="mapperLocations"></property>    指定映射文件的位置，但在此时注解开发，因此不使用此配置       -->
+		
+	</bean>
+
+	<!-- 配置spring在创建SqlSessionFactoryBean时要扫描的包 -->
+	<bean id="mapperScan" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.zdb.ssm.dao"></property>
+	
+	</bean>
+	
+	<!-- 配置事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="datasource"></property>
+	</bean>	
+	<!-- 配置事务的通知 -->
+	<tx:advice id="txAdive" transaction-manager="transactionManager">
+		<!-- 配置事务的属性 -->
+		<tx:attributes>
+			<tx:method name="*" read-only="false" propagation="REQUIRED"/>
+			<tx:method name="find*" read-only="true" propagation="SUPPORTS" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- 配置aop -->
+	<aop:config>
+		<!-- 配置通用切入点表达式 -->
+		<aop:pointcut expression="execution(* com.zdb.ssm.service.impl.*.*(..))" id="pt1"/>
+		<!-- 建立事务通知和切入点表达式的关系 -->
+		<aop:advisor advice-ref="txAdive" pointcut-ref="pt1"/>
+	</aop:config>
+
+
+
+
+
+
+
+
+
+</beans>

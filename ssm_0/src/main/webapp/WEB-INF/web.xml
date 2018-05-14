@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+  <display-name>ssm_0</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  
+  <!-- 配置springMVC提供的前端控制器 -->
+  <servlet>
+  	<servlet-name>DispatcherServlet</servlet-name>
+  	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	<!-- 配置serlvet的初始化参数，用户读取springMVC的配置文件 -->
+	<init-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:springmvc.xml</param-value>
+	</init-param>
+	<!-- 配置servlet的启动顺序 -->
+	<load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>DispatcherServlet</servlet-name>
+  	<url-pattern>/</url-pattern>
+  </servlet-mapping>
+  
+  
+  <!-- 配置监听器，sprin提供的，用于保证在应用加载时创建容器（继承的servletContext监听器）
+  		【只能加载在WEB-INF目录下的spring配置文件，并且名称必须为applicationContext.xml】
+   -->
+   <listener>
+   		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+   </listener>
+   
+   <!-- 若配置文件想自定义位置和文件名，需要配置ServletContext的初始化参数 -->
+  <context-param>
+  	<param-name>contextConfigLocation</param-name>
+  	<param-value>classpath:applicationContext.xml</param-value>
+  </context-param>
+  
+</web-app>
